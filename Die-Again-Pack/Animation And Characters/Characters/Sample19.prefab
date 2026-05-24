@@ -1808,9 +1808,9 @@ MonoBehaviour:
   anim: {fileID: 5616121376803935101}
   gameInput1: {fileID: 3120875504512807303}
   isWalking: 0
-  moveSpeed: 10
+  moveSpeed: 12
   rorateSpeed: 20
-  jumpForce: 20
+  jumpForce: 10
   groundCheckDistance: 2
   groundLayer:
     serializedVersion: 2

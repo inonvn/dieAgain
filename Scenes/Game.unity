@@ -1784,6 +1784,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   SaveLV:
   - {fileID: 11400000, guid: 72aea295607ffc7469b9d9a308d146b4, type: 2}
+  - {fileID: 11400000, guid: 74d171682e70d1f4a9c67faf66fbb455, type: 2}
+  - {fileID: 11400000, guid: b5a8abeaaff4e1244b35b11db4228df4, type: 2}
+  - {fileID: 11400000, guid: e3bfa3bf0b0f4a440aac1382fdefcfb9, type: 2}
   LvNow: 0
   CheckType: 0
   movePlayer: {fileID: 5662566486515035339, guid: 3b03c219103caf0459b2f83d5939296b, type: 3}
@@ -2898,7 +2901,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1980925286
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2916,8 +2919,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -32.02}
-  m_SizeDelta: {x: 300, y: 150}
+  m_AnchoredPosition: {x: 0, y: -56}
+  m_SizeDelta: {x: 300, y: 118}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &1980925287
 CanvasGroup:
