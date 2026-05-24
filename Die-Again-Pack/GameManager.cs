@@ -10,20 +10,42 @@ public class GameManager : MonoBehaviour
     public CheckTypeDriver CheckType;
     public MovePlayer movePlayer;
     public Action<int> OnLevelLoaded;
+    public Action OnDieLoaded;
     public bool playerDie;
+    public int deathCount;
+
+    public void PlayerDied()
+    {
+        playerDie = true;
+        deathCount++;
+        OnDieLoaded?.Invoke();
+    }
 
     private void Awake()
     {
         instance = this;
         CheckTB();
     }
+    private GameObject currentLevelObj;
+    public GameObject currentPlayerObj;
+
     public void LoadLV(int LV)
     {
         var e = SaveLV.Find(o=>o.LV == LV);
+        LvNow = LV;
+
         if (e != null)
         {
-            var e1 = Instantiate(e.GameObject);
-            var e2 = Instantiate(movePlayer.gameObject,e.PlayerSpawn,Quaternion.identity);
+            if (currentLevelObj != null) Destroy(currentLevelObj);
+            if (currentPlayerObj != null) Destroy(currentPlayerObj);
+
+            currentLevelObj = Instantiate(e.GameObject);
+           
+            currentPlayerObj = Instantiate(movePlayer.gameObject,e.spawnPos,Quaternion.identity);
+            
+            // Đặt lại trạng thái sống của người chơi
+            playerDie = false;
+            
             OnLevelLoaded?.Invoke(LV);
         }
     }

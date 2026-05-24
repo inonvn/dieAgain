@@ -3,14 +3,14 @@ using UnityEngine;
 public class MiniGame : MonoBehaviour
 {
     [Header("Trap Settings (Vùng kích hoạt)")]
-    public GameObject trapObject; // Vật thể bẫy (ví dụ: cái cây, khối gạch)
-    public bool isFallingTrap; // Đánh dấu nếu là bẫy rơi (cần Rigidbody)
-    public bool isAnimationTrap; // Đánh dấu nếu bẫy dùng Animation
-    public string animationTriggerName = "Activate"; // Tên Trigger trong Animator
+    public GameObject trapObject; 
+    public bool isFallingTrap; 
+    public bool isAnimationTrap; 
+    public string animationTriggerName = "Activate";
     
     [Header("Moving Trap (Bẫy di chuyển)")]
-    public bool isMovingTrap; // Đánh dấu bẫy di chuyển tới vị trí khác (VD: gai đâm)
-    public Transform targetMovePoint; // Vị trí bẫy sẽ phi tới
+    public bool isMovingTrap; 
+    public Transform targetMovePoint; 
     public float moveSpeed = 15f;
 
     [Header("Disappear Trap (Bẫy biến mất)")]

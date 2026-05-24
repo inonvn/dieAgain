@@ -5,5 +5,5 @@ public class SaveObj : ScriptableObject
 {
     public int LV;
     public GameObject GameObject;
-    public Vector3 PlayerSpawn;
+    public Vector3 spawnPos;
 }

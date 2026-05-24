@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: map1
   m_EditorClassIdentifier: Assembly-CSharp::SaveObj
   LV: 0
-  GameObject: {fileID: 0}
+  GameObject: {fileID: 8473312679843505361, guid: 1035faffcf8883746aa3ae5629fa0acb, type: 3}
+  spawnPos: {x: 2.68, y: 21.17, z: 89.56}
