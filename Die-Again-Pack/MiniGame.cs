@@ -21,6 +21,12 @@ public class MiniGame : MonoBehaviour
     public bool isTeleportTrap; // Đánh dấu nếu muốn dịch chuyển người chơi
     public Transform teleportPoint; // Vị trí đích đến
 
+    [Header("Push Trap (Bẫy đẩy)")]
+    public bool isPushTrap; // Đánh dấu nếu là bẫy đẩy người chơi
+    public float pushForce = 25f; // Lực đẩy
+    public bool useTrapForward = true; // Sử dụng hướng transform.forward của bẫy
+    public Vector3 customPushDirection = Vector3.forward; // Hướng đẩy tùy chỉnh nếu không dùng forward
+
     [Header("Death Zone (Vùng gây chết)")]
     public bool isDeathZone; // Nếu tích vào đây, khi chạm vào Player sẽ chết ngay
     public Effect trapEffect = Effect.None; // Hiệu ứng đặc biệt nếu có
@@ -29,22 +35,23 @@ public class MiniGame : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Kiểm tra xem đối tượng va chạm có phải là Player không
+      
         if (other.CompareTag("Player") && !isActivated)
         {
             if (isDeathZone)
             {
-                // Xử lý khi Player chạm vùng chết
                 Debug.Log("Player đụng bẫy và chết!");
-                // Bạn có thể gọi GameManager để reload lại scene ở đây:
-                // UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+                if (GameManager.instance != null)
+                {
+                    GameManager.instance.PlayerDied();
+                }
             }
             else
             {
-                // Dịch chuyển người chơi nếu đây là bẫy dịch chuyển
+                
                 if (isTeleportTrap && teleportPoint != null)
                 {
-                    // Tạm tắt CharacterController (nếu có) để tránh lỗi không nhận position mới
+                    
                     CharacterController cc = other.GetComponent<CharacterController>();
                     if (cc != null) cc.enabled = false;
                     
@@ -53,7 +60,17 @@ public class MiniGame : MonoBehaviour
                     if (cc != null) cc.enabled = true;
                 }
 
-                // Nếu là vùng kích hoạt bẫy (Trigger)
+                if (isPushTrap)
+                {
+                    MovePlayer movePlayer = other.GetComponent<MovePlayer>();
+                    if (movePlayer != null)
+                    {
+                        Vector3 pushDir = useTrapForward ? transform.forward : customPushDirection.normalized;
+                        movePlayer.ApplyPush(pushDir * pushForce);
+                    }
+                }
+
+         
                 isActivated = true;
                 ActivateTrap();
             }
@@ -62,7 +79,7 @@ public class MiniGame : MonoBehaviour
 
     private void ActivateTrap()
     {
-        // 1. Kích hoạt bẫy rơi (Dùng Rigidbody)
+       
         if (isFallingTrap && trapObject != null)
         {
             Rigidbody rb = trapObject.GetComponent<Rigidbody>();
@@ -73,7 +90,7 @@ public class MiniGame : MonoBehaviour
             }
         }
 
-        // 2. Kích hoạt bẫy Animation (Ví dụ: Cây ngả đổ xuống)
+       
         if (isAnimationTrap && trapObject != null)
         {
             Animator anim = trapObject.GetComponent<Animator>();
@@ -83,7 +100,7 @@ public class MiniGame : MonoBehaviour
             }
         }
 
-        // 4. Kích hoạt bẫy biến mất
+      
         if (isDisappearTrap && trapObject != null)
         {
             if (delayDisappear > 0)
@@ -99,7 +116,7 @@ public class MiniGame : MonoBehaviour
 
     private void Update()
     {
-        // 3. Xử lý bẫy di chuyển
+       
         if (isActivated && isMovingTrap && trapObject != null && targetMovePoint != null)
         {
             trapObject.transform.position = Vector3.MoveTowards(

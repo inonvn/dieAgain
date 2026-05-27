@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3857536632715665944}
   m_Layer: 0
   m_Name: nextLV
-  m_TagString: Untagged
+  m_TagString: Door
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,7 +106,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -462,6 +462,10 @@ MonoBehaviour:
   delayDisappear: 0
   isTeleportTrap: 0
   teleportPoint: {fileID: 0}
+  isPushTrap: 1
+  pushForce: 25
+  useTrapForward: 0
+  customPushDirection: {x: 20, y: 0, z: 0}
   isDeathZone: 0
   trapEffect: 0
 --- !u!1 &5774189405561496736
@@ -849,6 +853,10 @@ MonoBehaviour:
   delayDisappear: 0
   isTeleportTrap: 0
   teleportPoint: {fileID: 0}
+  isPushTrap: 0
+  pushForce: 25
+  useTrapForward: 1
+  customPushDirection: {x: 0, y: 0, z: 1}
   isDeathZone: 0
   trapEffect: 0
 --- !u!65 &3676178340488348676

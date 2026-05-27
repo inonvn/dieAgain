@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 public class UI_Manager : MonoBehaviour
 {
     public CanvasGroup BoxMenu;
@@ -10,14 +11,27 @@ public class UI_Manager : MonoBehaviour
     public CanvasGroup ButtonUiMobile;
     public CanvasGroup ShowEnd;
     public CanvasGroup ShowDie;
+    public CanvasGroup ShowMenu;
     public CanvasGroup Menu;
     public TextMeshProUGUI point;
+
+    [Header("Audio Settings")]
+    public AudioClip bgMusic;
+    public AudioSource bgAudioSource;
+    public Slider AudioSider;
 
     void Start()
     {
         ButtonUiMobile.gameObject.SetActive(false);
         BoxMenu.gameObject.SetActive(false);
         StartIcon.gameObject.SetActive(true);
+
+        if (bgAudioSource == null)
+        {
+            bgAudioSource = gameObject.AddComponent<AudioSource>();
+            bgAudioSource.loop = true;
+            bgAudioSource.playOnAwake = false;
+        }
 
         GameManager.instance.OnLevelLoaded += HandleLevelLoaded;
         GameManager.instance.OnDieLoaded += OnShowDie;
@@ -36,8 +50,19 @@ public class UI_Manager : MonoBehaviour
     {
         Menu.gameObject.SetActive(false);
         ShowDie.gameObject.SetActive(false);
-        BoxMenu.gameObject.SetActive(false); 
+        BoxMenu.gameObject.SetActive(false);
+        Fade.gameObject.SetActive(true);
+        RandomInon.FadeIn(Fade);
         ShowUIonMoblie();
+
+        if (bgMusic != null && bgAudioSource != null)
+        {
+            bgAudioSource.clip = bgMusic;
+            if (!bgAudioSource.isPlaying)
+            {
+                bgAudioSource.Play();
+            }
+        }
     }
     public void MenuOn()
     {
@@ -45,16 +70,38 @@ public class UI_Manager : MonoBehaviour
         ShowDie.gameObject.SetActive(false);
         BoxMenu.gameObject.SetActive(false);
         StartIcon.gameObject.SetActive(true);
+        ShowMenu.gameObject.SetActive(false);
+        if (bgAudioSource != null && bgAudioSource.isPlaying)
+        {
+            bgAudioSource.Stop();
+        }
     }    
-
+    public void SettingOn()
+    {
+        ShowMenu.gameObject.SetActive(true);
+        RandomInon.FadeOut(ShowMenu);
+        bgAudioSource.volume = AudioSider.value;
+        GameManager.instance.audioSource.volume = AudioSider.value;
+        if (GameManager.instance != null) GameManager.instance.isSettingsOpen = true;
+    }    
+    public void settingOff ()
+    {
+        ShowMenu.gameObject.SetActive(true);
+        RandomInon.FadeIn(ShowMenu);
+        bgAudioSource.volume = AudioSider.value;
+        GameManager.instance.audioSource.volume = AudioSider.value;
+        if (GameManager.instance != null) GameManager.instance.isSettingsOpen = false;
+    }    
    
     public void Restart()
     {
+        RandomInon.ButtonSound(GameManager.instance.audioSource, GameManager.instance.buttonSound);
         GameManager.instance.LoadLV(GameManager.instance.LvNow);
     }
    
     public void GoToChooseLV()
     {
+        RandomInon.ButtonSound(GameManager.instance.audioSource, GameManager.instance.buttonSound);
         BoxMenu.gameObject.SetActive(true);
         RandomInon.FadeOut(BoxMenu);
         StartIcon.gameObject.SetActive(false);
@@ -67,6 +114,14 @@ public class UI_Manager : MonoBehaviour
         {
             {
                 var e1 = Instantiate(ButtonSpawn, f.transform);
+                if (e > GameManager.instance.LvNow)
+                {
+                    e1.Lock.gameObject.SetActive(true);
+                }
+                else
+                {
+                    e1.Lock.gameObject.SetActive(false);
+                }
                 e1.transform.GetChild(0).GetComponent<TextMeshProUGUI>().SetText((e + 1).ToString());
                 e1.LV = e;
             }
@@ -74,11 +129,20 @@ public class UI_Manager : MonoBehaviour
     }
     public void OnShowDie()
     {
+        if (bgAudioSource != null && bgAudioSource.isPlaying)
+        {
+            bgAudioSource.Stop();
+        }
         StartCoroutine(OnShowDieCoroutine());
     }    
 
     private IEnumerator OnShowDieCoroutine()
     {
+        if (GameManager.instance != null && GameManager.instance.audioSource != null && GameManager.instance.deathSound != null)
+        {
+            RandomInon.ButtonSound(GameManager.instance.audioSource, GameManager.instance.deathSound);
+        }
+
         float waitTime = 1f; 
 
     
@@ -115,6 +179,21 @@ public class UI_Manager : MonoBehaviour
         if (GameManager.instance.CheckType == CheckTypeDriver.moblie)
         {
             ButtonUiMobile.gameObject.SetActive(true);
+            RectTransform rect = ButtonUiMobile.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                Rect safeArea = Screen.safeArea;
+                Vector2 anchorMin = safeArea.position;
+                Vector2 anchorMax = safeArea.position + safeArea.size;
+
+                anchorMin.x /= Screen.width;
+                anchorMin.y /= Screen.height;
+                anchorMax.x /= Screen.width;
+                anchorMax.y /= Screen.height;
+
+                rect.anchorMin = anchorMin;
+                rect.anchorMax = anchorMax;
+            }
         }
     }
       

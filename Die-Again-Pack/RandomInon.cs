@@ -74,13 +74,22 @@ public static class RandomInon
         canvasGroup.DOKill();
         canvasGroup.DOFade(1, 0.5f).OnComplete(() => { canvasGroup.alpha = 1; SceneManager.LoadScene(NumScene); });
     }
-    public static void ButtonSound (this AudioSource audioSource, AudioClip audioClip )
+    public static void ButtonSound(this AudioSource audioSource, AudioClip audioClip)
     {
-        var e = EventSystem.current.currentSelectedGameObject;
-        Debug.Log(e.name);
-    e.GetComponent<Button>().onClick.AddListener(() => {
+        if (audioSource != null && audioClip != null)
+        {
             audioSource.PlayOneShot(audioClip);
-        });
-      
+        }
+    }
+
+    public static void AddSound(this Button button, AudioSource audioSource, AudioClip audioClip)
+    {
+        if (button != null && audioSource != null && audioClip != null)
+        {
+            button.onClick.AddListener(() =>
+            {
+                audioSource.PlayOneShot(audioClip);
+            });
+        }
     }
 }

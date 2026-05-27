@@ -12,7 +12,14 @@ public class GameManager : MonoBehaviour
     public Action<int> OnLevelLoaded;
     public Action OnDieLoaded;
     public bool playerDie;
+    public bool isSettingsOpen;
     public int deathCount;
+    public Joystick gameInput1;
+
+    [Header("Audio Settings")]
+    public AudioClip deathSound;
+    public AudioClip buttonSound;
+    public AudioSource audioSource;
 
     public void PlayerDied()
     {
@@ -25,6 +32,12 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
         CheckTB();
+        
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
     private GameObject currentLevelObj;
     public GameObject currentPlayerObj;
@@ -43,8 +56,9 @@ public class GameManager : MonoBehaviour
            
             currentPlayerObj = Instantiate(movePlayer.gameObject,e.spawnPos,Quaternion.identity);
             
-            // Đặt lại trạng thái sống của người chơi
+          
             playerDie = false;
+            isSettingsOpen = false;
             
             OnLevelLoaded?.Invoke(LV);
         }

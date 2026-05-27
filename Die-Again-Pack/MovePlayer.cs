@@ -13,11 +13,18 @@ public class MovePlayer : MonoBehaviour
     [SerializeField] private float groundCheckDistance = 1.1f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask deadZoneLayer;
+    [SerializeField] private float pushDecaySpeed = 5f;
 
     private Vector2 currentInput;
     private float jumpBufferCounter;
     private float jumpBufferTime = 0.2f;
     private bool isDeadProcessed = false;
+    private Vector3 externalPushVelocity;
+
+    public void ApplyPush(Vector3 force)
+    {
+        externalPushVelocity = force;
+    }
 
     void Start()
     {
@@ -27,10 +34,11 @@ public class MovePlayer : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.instance.playerDie == false)
+        if (GameManager.instance.playerDie == false && GameManager.instance.isSettingsOpen == false)
         {
             if (GameManager.instance.CheckType == CheckTypeDriver.moblie)
             {
+                gameInput1.joystick=GameManager.instance.gameInput1;
                 currentInput = gameInput1.getMovementVectorNormalized();
             }
             else if (GameManager.instance.CheckType == CheckTypeDriver.Pc)
@@ -53,33 +61,53 @@ public class MovePlayer : MonoBehaviour
         else
         {
             currentInput = Vector2.zero;
-            if (!isDeadProcessed)
+            if (GameManager.instance.playerDie)
             {
-                if (anim != null) 
+                if (!isDeadProcessed)
                 {
-                    // Dừng các logic di chuyển/nhảy cũ
-                    anim.SetFloat("Speed", 0f);
-                    anim.ResetTrigger("Jump");
-                    
-                    // Kích hoạt animation chết
-                    anim.SetBool("isDead", true);
-                    
-                    // Ép Animator cập nhật ngay lập tức trong frame này để hủy bỏ các animation đang dang dở
-                    anim.Update(0f);
+                    if (anim != null) 
+                    {
+                        
+                        anim.SetFloat("Speed", 0f);
+                        anim.ResetTrigger("Jump");
+                        
+                        
+                        anim.SetBool("isDead", true);
+                        
+                     
+                        anim.Update(0f);
+                    }
+                    isDeadProcessed = true;
                 }
-                isDeadProcessed = true;
+            }
+            else
+            {
+                if (anim != null)
+                {
+                    anim.SetFloat("Speed", 0f);
+                }
             }
         }
     }
 
     void FixedUpdate()
     {
-        if (GameManager.instance.playerDie == false)
+        if (GameManager.instance.playerDie == false && GameManager.instance.isSettingsOpen == false)
         {
             CheckDeadZone();
             if (GameManager.instance.playerDie) return;
 
             HandleMovement(currentInput);
+
+            if (externalPushVelocity.magnitude > 0.05f)
+            {
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x + externalPushVelocity.x, rb.linearVelocity.y + externalPushVelocity.y, rb.linearVelocity.z + externalPushVelocity.z);
+                externalPushVelocity = Vector3.Lerp(externalPushVelocity, Vector3.zero, Time.fixedDeltaTime * pushDecaySpeed);
+            }
+            else
+            {
+                externalPushVelocity = Vector3.zero;
+            }
 
             if (jumpBufferCounter > 0)
             {
@@ -139,7 +167,7 @@ public class MovePlayer : MonoBehaviour
 
     private void CheckDeadZone()
     {
-        // Bắn tia raycast xuống dưới để kiểm tra layer DeadZone
+        
         if (Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, deadZoneLayer))
         {
             if (GameManager.instance.playerDie == false)
@@ -148,4 +176,46 @@ public class MovePlayer : MonoBehaviour
             }
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        CheckDoorCollision(other.gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        CheckDoorCollision(collision.gameObject);
+    }
+
+    private void CheckDoorCollision(GameObject obj)
+    {
+        bool isDoor = obj.CompareTag("Door");
+        if (isDoor)
+        {
+            LoadNextLevel();
+        }
+    }
+
+    private void LoadNextLevel()
+    {
+        if (GameManager.instance != null && !GameManager.instance.playerDie)
+        {
+            int nextLevelIndex = GameManager.instance.LvNow + 1;
+            if (nextLevelIndex < GameManager.instance.SaveLV.Count)
+            {
+                GameManager.instance.LoadLV(nextLevelIndex);
+            }
+            else
+            {
+                
+                UI_Manager uiManager = FindObjectOfType<UI_Manager>();
+                if (uiManager != null && uiManager.ShowEnd != null)
+                {
+                    uiManager.ShowEnd.gameObject.SetActive(true);
+                    RandomInon.FadeOut(uiManager.ShowEnd);
+                }
+            }
+        }
+    }
 }
+
